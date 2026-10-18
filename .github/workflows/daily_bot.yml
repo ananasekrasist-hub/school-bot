@@ -1,0 +1,36 @@
+name: School Schedule Bot
+
+on:
+  schedule:
+    # 12:00 UTC = 15:00 МСК/Минск (Вс, Пн, Вт, Ср, Чт)
+    - cron: '0 12 * * 0,1,2,3,4'
+    # 17:00 UTC = 20:00 МСК/Минск (Пн, Вт, Ср, Чт)
+    - cron: '0 17 * * 1,2,3,4'
+  workflow_dispatch:
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Скачивание кода
+        uses: actions/checkout@v4
+
+      - name: Установка Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Установка библиотек
+        run: pip install requests pytz
+
+      - name: Запуск бота
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+        run: |
+          HOUR=$(date -u +%H)
+          if [ "$HOUR" -ge 15 ]; then
+            python bot.py homework
+          else
+            python bot.py schedule
+          fi
