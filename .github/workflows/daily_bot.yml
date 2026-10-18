@@ -30,7 +30,7 @@ jobs:
         run: |
           HOUR=$(date -u +%H)
           if [ "$HOUR" -ge 15 ]; then
-            python bot.py homework
+            python bot.py schedule
           else
             python bot.py schedule
           fi
