@@ -28,9 +28,14 @@ jobs:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
         run: |
-          HOUR=$(date -u +%H)
-          if [ "$HOUR" -ge 15 ]; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             python bot.py schedule
           else
-            python bot.py schedule
+            HOUR=$(date -u +%H)
+            if [ "$HOUR" -ge 15 ]; then
+              python bot.py homework
+            else
+              python bot.py schedule
+            fi
+       
           fi
