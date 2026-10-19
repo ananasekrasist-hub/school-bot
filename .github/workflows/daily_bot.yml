@@ -2,10 +2,10 @@ name: School Schedule Bot
 
 on:
   schedule:
-    # 12:00 UTC = 15:00 МСК/Минск (Вс, Пн, Вт, Ср, Чт)
-    - cron: '0 12 * * 0,1,2,3,4'
-    # 17:00 UTC = 20:00 МСК/Минск (Пн, Вт, Ср, Чт)
-    - cron: '0 17 * * 1,2,3,4'
+    # 12:12 UTC = 15:12 МСК/Минск (Вс, Пн, Вт, Ср, Чт)
+    - cron: '12 12 * * 0,1,2,3,4'
+    # 17:02 UTC = 20:02 МСК/Минск (Пн, Вт, Ср, Чт)
+    - cron: '2 17 * * 1,2,3,4'
   workflow_dispatch:
 
 jobs:
@@ -28,14 +28,10 @@ jobs:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            python bot.py schedule
+          echo "Причина запуска: ${{ github.event_name }} (${{ github.event.schedule }})"
+          if [ "${{ github.event.schedule }}" = "2 17 * * 1,2,3,4" ]; then
+            python bot.py homework
           else
-            HOUR=$(date -u +%H)
-            if [ "$HOUR" -ge 15 ]; then
-              python bot.py homework
-            else
-              python bot.py schedule
-            fi
+            python bot.py schedule
        
           fi
