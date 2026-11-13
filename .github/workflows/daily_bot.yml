@@ -1,12 +1,16 @@
 name: School Schedule Bot
 
 on:
-  schedule:
-    # 12:12 UTC = 15:12 МСК/Минск (Вс, Пн, Вт, Ср, Чт)
-    - cron: '12 12 * * 0,1,2,3,4'
-    # 17:02 UTC = 20:02 МСК/Минск (Пн, Вт, Ср, Чт)
-    - cron: '2 17 * * 1,2,3,4'
   workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Режим запуска (schedule или homework)'
+        required: true
+        default: 'schedule'
+        type: choice
+        options:
+          - schedule
+          - homework
 
 jobs:
   run-bot:
@@ -19,19 +23,17 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+          cache: 'pip'
 
       - name: Установка библиотек
-        run: pip install requests pytz
+        run: pip install -r requirements.txt || pip install requests pytz
 
       - name: Запуск бота
         env:
           BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
         run: |
-          echo "Причина запуска: ${{ github.event_name }} (${{ github.event.schedule }})"
-          if [ "${{ github.event.schedule }}" = "2 17 * * 1,2,3,4" ]; then
-            python bot.py homework
-          else
-            python bot.py schedule
-       
-          fi
+          MODE="${{ github.event.inputs.mode || 'schedule' }}"
+          echo "Запуск в режиме: $MODE"
+          python bot.py "$
+          MODE"
